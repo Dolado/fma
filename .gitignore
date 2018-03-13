@@ -9,6 +9,7 @@ __pycache__/
 .python-version
 
 # Data
+data/
 *.csv
 *.pickle
 *.mp3
