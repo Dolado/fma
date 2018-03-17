@@ -1,4 +1,4 @@
-import dotenv
+
 import pydot
 import requests
 import numpy as np
@@ -17,7 +17,7 @@ NB_AUDIO_SAMPLES = 1321967
 SAMPLING_RATE = 44100
 
 # Load the environment from the .env file.
-dotenv.load_dotenv(dotenv.find_dotenv())
+
 
 
 class FreeMusicArchive:
@@ -198,10 +198,21 @@ def load(filepath):
 
         COLUMNS = [('track', 'tags'), ('album', 'tags'), ('artist', 'tags'),
                    ('track', 'genres'), ('track', 'genres_all'),
-                   ('track', 'genres_top')]
-        for column in COLUMNS:
-            tracks[column] = tracks[column].map(ast.literal_eval)
-
+                   ('track', 'genre_top')]
+        
+     ## Commented because unfixed valueError exception  
+     ##   for column in COLUMNS:
+     ##       tracks[column]= tracks[column].map(ast.literal_eval)
+       ##     for i in range(len(tracks[column])):
+        ##        try:
+               ##         tracks[column].iloc[i]= ast.literal_eval(tracks[column].iloc[i])
+       ##             ast.literal_eval(tracks[column].iloc[i])
+       ##         except ValueError:
+        ##            print("Oops!  That was no valid number",tracks[column].iloc[i],i)
+         ##       except KeyError:
+          ##          print("Oops!  That was no valid key",column,i)
+                    
+                    
         COLUMNS = [('track', 'date_created'), ('track', 'date_recorded'),
                    ('album', 'date_created'), ('album', 'date_released'),
                    ('artist', 'date_created'), ('artist', 'active_year_begin'),
@@ -216,6 +227,7 @@ def load(filepath):
         COLUMNS = [('track', 'license'), ('artist', 'bio'),
                    ('album', 'type'), ('album', 'information')]
         for column in COLUMNS:
+            
             tracks[column] = tracks[column].astype('category')
 
         return tracks
