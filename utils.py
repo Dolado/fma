@@ -9,6 +9,7 @@ import multiprocessing
 import multiprocessing.sharedctypes as sharedctypes
 import os.path
 import ast
+import subprocess as sp
 
 
 # Number of samples per 30s audio clip.
@@ -184,6 +185,9 @@ def load(filepath):
 
     filename = os.path.basename(filepath)
 
+    if 'artists' in filename:
+        return pd.read_csv(filepath, index_col=0)
+    
     if 'features' in filename:
         return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
 
@@ -192,7 +196,10 @@ def load(filepath):
 
     if 'genres' in filename:
         return pd.read_csv(filepath, index_col=0)
-
+    
+    if 'raw_tracks' in filename:
+        return pd.read_csv(filepath, index_col=0)
+    
     if 'tracks' in filename:
         tracks = pd.read_csv(filepath, index_col=0, header=[0, 1])
 
@@ -364,3 +371,24 @@ def build_sample_loader(audio_dir, Y, loader):
                 return self.X[:batch_size], self.Y[:batch_size]
 
     return SampleLoader
+
+
+def all_mp3_to_wav(path_to_mp3_folder):
+    #FFMPEG_BIN = 'ffmpeg' # Linux
+    FFMPEG_BIN = 'ffmpeg.exe' # Windows    
+    for base, dirs, files in os.walk(path_to_mp3_folder):
+        print(base)
+        for file in files:
+            filename,ext = (os.path.splitext(file)[0],os.path.splitext(file)[1])
+            filename_full_path=base+'\\'+filename
+
+            if ext == '.mp3':     
+                command = ( FFMPEG_BIN+' -i '+filename_full_path+'.mp3' 
+                                       ' -vn' 
+                                       ' -ac'  ' 1' 
+                                       ' -acodec'  ' pcm_s16le' 
+                                       ' -ar'  ' 44100'  # ouput will have 44100 Hz
+                                       ' -y'
+                                       ' -f'  ' wav '+filename_full_path +'.wav')
+
+                sp.check_output(command)
